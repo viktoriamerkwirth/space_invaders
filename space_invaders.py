@@ -112,27 +112,65 @@ class Enemy:
     def draw(self, surface):
         # Animated alien with pulsing effect
         pulse = math.sin(pygame.time.get_ticks() * 0.005 + self.anim_offset) * 3
+        time = pygame.time.get_ticks() * 0.01
         
-        # Glow effect
-        glow_surface = pygame.Surface((self.width + 20, self.height + 20), pygame.SRCALPHA)
-        pygame.draw.circle(glow_surface, (*self.color, 20), (self.width // 2 + 10, self.height // 2 + 10), 25)
-        surface.blit(glow_surface, (self.x - 10, self.y - 10))
+        # Ominous dark glow effect
+        glow_surface = pygame.Surface((self.width + 30, self.height + 30), pygame.SRCALPHA)
+        pygame.draw.circle(glow_surface, (*self.color, 40), (self.width // 2 + 15, self.height // 2 + 15), 30)
+        pygame.draw.circle(glow_surface, (255, 0, 0, 20), (self.width // 2 + 15, self.height // 2 + 15), 35)
+        surface.blit(glow_surface, (self.x - 15, self.y - 15))
         
-        # Body
-        pygame.draw.rect(surface, self.color, (self.x + 5, self.y + 10, self.width - 10, self.height - 15))
+        # Skull-like head
+        head_y = self.y + pulse
+        pygame.draw.ellipse(surface, self.color, (self.x + 5, head_y, self.width - 10, self.height - 10))
         
-        # Eyes
-        eye_y = self.y + 15 + pulse
-        pygame.draw.circle(surface, WHITE, (int(self.x + 12), int(eye_y)), 6)
-        pygame.draw.circle(surface, WHITE, (int(self.x + self.width - 12), int(eye_y)), 6)
-        pygame.draw.circle(surface, RED, (int(self.x + 12), int(eye_y)), 3)
-        pygame.draw.circle(surface, RED, (int(self.x + self.width - 12), int(eye_y)), 3)
+        # Large menacing eyes with glow
+        eye_spacing = 15
+        left_eye_x = self.x + self.width // 2 - eye_spacing
+        right_eye_x = self.x + self.width // 2 + eye_spacing
+        eye_y = head_y + 12
         
-        # Antennae
-        pygame.draw.line(surface, self.color, (self.x + 10, self.y + 10), (self.x + 5, self.y), 3)
-        pygame.draw.line(surface, self.color, (self.x + self.width - 10, self.y + 10), (self.x + self.width - 5, self.y), 3)
-        pygame.draw.circle(surface, self.color, (self.x + 5, self.y), 4)
-        pygame.draw.circle(surface, self.color, (self.x + self.width - 5, self.y), 4)
+        # Eye sockets (dark)
+        pygame.draw.ellipse(surface, BLACK, (left_eye_x - 8, eye_y - 6, 16, 18))
+        pygame.draw.ellipse(surface, BLACK, (right_eye_x - 8, eye_y - 6, 16, 18))
+        
+        # Glowing pupils that follow player
+        pygame.draw.circle(surface, RED, (int(left_eye_x), int(eye_y)), 6)
+        pygame.draw.circle(surface, RED, (int(right_eye_x), int(eye_y)), 6)
+        pygame.draw.circle(surface, (255, 100, 100), (int(left_eye_x), int(eye_y)), 3)
+        pygame.draw.circle(surface, (255, 100, 100), (int(right_eye_x), int(eye_y)), 3)
+        
+        # Sharp teeth/mouth
+        mouth_y = head_y + 25
+        teeth_points = [
+            (self.x + 10, mouth_y),
+            (self.x + 15, mouth_y + 6),
+            (self.x + 20, mouth_y),
+            (self.x + 25, mouth_y + 6),
+            (self.x + 30, mouth_y)
+        ]
+        pygame.draw.lines(surface, (200, 200, 200), False, teeth_points, 2)
+        
+        # Menacing tentacles/claws
+        tentacle_wave = math.sin(time + self.anim_offset) * 5
+        # Left tentacles
+        pygame.draw.line(surface, self.color, 
+                        (self.x + 5, self.y + self.height - 5),
+                        (self.x - 5, self.y + self.height + 5 + tentacle_wave), 3)
+        pygame.draw.line(surface, self.color,
+                        (self.x + 10, self.y + self.height - 5),
+                        (self.x + 5, self.y + self.height + 8 + tentacle_wave), 3)
+        # Right tentacles  
+        pygame.draw.line(surface, self.color,
+                        (self.x + self.width - 5, self.y + self.height - 5),
+                        (self.x + self.width + 5, self.y + self.height + 5 - tentacle_wave), 3)
+        pygame.draw.line(surface, self.color,
+                        (self.x + self.width - 10, self.y + self.height - 5),
+                        (self.x + self.width - 5, self.y + self.height + 8 - tentacle_wave), 3)
+        
+        # Sharp claws at tentacle ends
+        pygame.draw.circle(surface, (255, 50, 50), (self.x - 5, int(self.y + self.height + 5 + tentacle_wave)), 3)
+        pygame.draw.circle(surface, (255, 50, 50), (self.x + self.width + 5, int(self.y + self.height + 5 - tentacle_wave)), 3)
 
 # Bullet class
 class Bullet:
